@@ -44,8 +44,8 @@ int main()
             return 0;
         }
     }
-    double alphas[n], betas[n], y[n];
-    alphas[0] = r1; 
+    double alphas[n], betas[n], y[n + 1];
+    alphas[0] = r1;
     betas[0] = s1;
     for (int i = 1; i < n; i++) {
         double x = a + i * h;
@@ -53,11 +53,14 @@ int main()
         betas[i] = (betas[i - 1] * A(x, h) - f) / (B(x, h) - alphas[i - 1] * A(x, h));
     }
 
-    y[n - 1] = (betas[n - 1] * r2 + s2) / (1 - alphas[n - 1] * r2);
-    for (int i = n - 2; i >= 0; i--) {
-        y[i] = alphas[i + 1] * y[i + 1] + betas[i + 1];
+    y[n] = (betas[n - 1] * r2 + s2) / (1 - alphas[n - 1] * r2);
+    double maxErr = abs(y[n] - u(b));
+    for (int i = n - 1; i >= 0; i--) {
+        y[i] = alphas[i] * y[i + 1] + betas[i];
+        if (abs(y[i] - u(a + i * h) > maxErr)) maxErr = abs(y[i] - u(a + i * h));
     }
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i <= n; i++) {
         std::cout << a + i * h << ": " << y[i] << "\n";
     }
+    std::cout << "Maximum error: " << maxErr;
 }
